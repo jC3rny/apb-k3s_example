@@ -1,0 +1,51 @@
+---
+
+- hosts: all
+  gather_facts: yes
+  order: inventory
+  any_errors_fatal: no
+  ignore_unreachable: no
+
+
+# Install K3S server
+- name: Install K3S server
+  hosts: k3s_server
+  gather_facts: no
+  order: inventory
+  serial: 1
+  any_errors_fatal: no
+  ignore_unreachable: no
+  become: yes
+  vars:
+    k3s_advertise_address: "192.168.1.25"
+    k3s_advertise_address_fqdn: "vip.example.k3s.local"
+    k3s_cluster_cidr: "172.16.0.0/17"
+    k3s_service_cidr: "172.16.128.0/17"
+    k3s_cluster_domain: "example.k3s.local"
+    k3s_disabled_components: [ servicelb, traefik, metrics-server, local-storage ]
+    # k3s_cni_plugin: "calico"
+    # k3s_cni_calico_backend: "vxlan"
+    # k3s_cni_calico_firewall_rules:
+    #   - { protocol: udp, port_range: 8472, purpose: Calico networking with VXLAN }
+    k3s_node_taints:
+      - { name: node-role.kubernetes.io/master, value: "true", effect: "NoSchedule" }
+  roles:
+    - { role: k3s }
+
+
+# Install K3S agent
+- name: Install K3S agent
+  hosts: k3s_agent
+  gather_facts: no
+  order: inventory
+  any_errors_fatal: no
+  ignore_unreachable: no
+  become: yes
+  vars:
+    # k3s_cni_plugin: "calico"
+    # k3s_cni_calico_firewall_rules:
+    #   - { protocol: udp, port_range: 8472, purpose: Calico networking with VXLAN }
+    k3s_node_labels:
+      - { name: node-role.kubernetes.io/worker, value: "true" }
+  roles:
+    - { role: k3s }

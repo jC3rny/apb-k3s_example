@@ -1,0 +1,17 @@
+---
+
+# [ cri_prereq - vars ]
+crictl_runtime_endpoint: "unix:///var/run/k3s/containerd/containerd.sock"
+
+
+# [ k3s - vars ]
+k3s_install_version: "v1.21.11+k3s1"
+
+k3s_data_dir: "/opt/k3s"
+
+k3s_additional_options:
+  debug:
+  etcd-snapshot-schedule-cron: "0 */4 * * *"
+  etcd-snapshot-retention: 7
+  etcd-snapshot-dir: "/srv/backup/etcd"
+  write-kubeconfig-mode: "0644"

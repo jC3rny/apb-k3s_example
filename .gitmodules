@@ -1,0 +1,6 @@
+[submodule "roles/cri_prereq"]
+	path = roles/cri_prereq
+	url = https://github.com/jC3rny-AnsibleRoles/cri_prereq.git
+[submodule "roles/k3s"]
+	path = roles/k3s
+	url = https://github.com/jC3rny-AnsibleRoles/k3s.git

@@ -1,0 +1,13 @@
+---
+
+# Install K3S single server
+- name: Install K3S single server
+  hosts: localhost
+  gather_facts: yes
+  any_errors_fatal: no
+  ignore_unreachable: no
+  become: yes
+  vars:
+    k3s_disabled_components: [ servicelb, traefik, metrics-server ]
+  roles:
+    - { role: k3s }
