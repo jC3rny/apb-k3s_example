@@ -4,3 +4,6 @@
 [submodule "roles/k3s"]
 	path = roles/k3s
 	url = https://github.com/jC3rny-AnsibleRoles/k3s.git
+[submodule "roles/iptables"]
+	path = roles/iptables
+	url = git@github.com:jC3rny-AnsibleRoles/iptables.git
