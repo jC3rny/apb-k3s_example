@@ -1,17 +1,58 @@
 ---
 
 # [ iptables - vars ]
-iptables_firewall_service_always_reload: no
+iptables_default_rules:
+  - "01-chains": |
+      -N LOGGING
+  
+  - "51-filter_input": |
+      -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+      -A INPUT -i lo -j ACCEPT
+      -A INPUT -p icmp -j ACCEPT
+      -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
+
+  - "51-filter_forward": |
+      -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+      -A FORWARD -i lo -j ACCEPT
+      -A FORWARD -p icmp -j ACCEPT
+  
+  - "51-filter_output": |
+      -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+      -A OUTPUT -o lo -j ACCEPT
+      -A OUTPUT -p icmp -j ACCEPT
+      # -A OUTPUT -p tcp -m tcp --sport 22 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  
+  - "90-logging": |
+      -A INPUT -j LOGGING
+  
+  - "95-logging_log": |
+      -A LOGGING -m limit --limit 2/min -j LOG --log-uid --log-prefix "iptables [WARNNG] " --log-level 7
+      -A LOGGING -j DROP
+  
+  - "99-chain_policy": |
+      -P INPUT DROP
+      -P FORWARD DROP
+      -P OUTPUT ACCEPT
 
 
 # [ cri_prereq - vars ]
-crictl_runtime_endpoint: "unix:///var/run/k3s/containerd/containerd.sock"
+cri_tools_install: no
+cri_crictl_runtime_endpoint: "unix:///var/run/k3s/containerd/containerd.sock"
 
 
 # [ k3s - vars ]
 k3s_install_version: "v1.21.14+k3s1"
 
 k3s_data_dir: "/opt/k3s"
+
+k3s_advertise_address: "192.168.1.25"
+k3s_advertise_address_fqdn: "k3s.example.local"
+k3s_cluster_domain: "cluster.example.local"
+
+k3s_cluster_cidr: "172.16.0.0/17"
+k3s_service_cidr: "172.16.128.0/17"
+
+k3s_disabled_components: [ servicelb, traefik, metrics-server, local-storage ]
 
 k3s_additional_options:
   debug:
